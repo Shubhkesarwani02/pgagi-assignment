@@ -93,7 +93,7 @@ export const fetchContent = createAsyncThunk(
   async (params: { category?: string; refresh?: boolean } = {}) => {
     try {
       const { category = "all" } = params
-      console.log("[v0] Fetching content for category:", category)
+  console.log("[pgagi] Fetching content for category:", category)
 
       const results = await Promise.allSettled([
         fetchNews(category === "all" ? undefined : category),
@@ -108,32 +108,32 @@ export const fetchContent = createAsyncThunk(
       // Handle news API result
       if (results[0].status === "fulfilled") {
         newsItems = results[0].value.articles.slice(0, 8).map(transformNewsToContentItem)
-        console.log("[v0] Successfully fetched", newsItems.length, "news items")
+  console.log("[pgagi] Successfully fetched", newsItems.length, "news items")
       } else {
-        console.error("[v0] News API failed:", results[0].reason)
+  console.error("[pgagi] News API failed:", results[0].reason)
       }
 
       // Handle movies API result
       if (results[1].status === "fulfilled") {
         movieItems = results[1].value.results.slice(0, 6).map((movie) => transformMovieToContentItem(movie))
-        console.log("[v0] Successfully fetched", movieItems.length, "movie items")
+  console.log("[pgagi] Successfully fetched", movieItems.length, "movie items")
       } else {
-        console.error("[v0] Movies API failed:", results[1].reason)
+  console.error("[pgagi] Movies API failed:", results[1].reason)
       }
 
       // Handle social API result
       if (results[2].status === "fulfilled") {
         socialItems = results[2].value.slice(0, 4).map(transformSocialToContentItem)
-        console.log("[v0] Successfully fetched", socialItems.length, "social items")
+  console.log("[pgagi] Successfully fetched", socialItems.length, "social items")
       } else {
-        console.error("[v0] Social API failed:", results[2].reason)
+  console.error("[pgagi] Social API failed:", results[2].reason)
       }
 
       const allItems = [...newsItems, ...movieItems, ...socialItems]
-      console.log("[v0] Total content items:", allItems.length)
+  console.log("[pgagi] Total content items:", allItems.length)
       return allItems
     } catch (error) {
-      console.error("[v0] Error fetching content:", error)
+  console.error("[pgagi] Error fetching content:", error)
       throw error
     }
   },
@@ -141,7 +141,7 @@ export const fetchContent = createAsyncThunk(
 
 export const fetchTrendingContent = createAsyncThunk("content/fetchTrendingContent", async () => {
   try {
-    console.log("[v0] Fetching trending content")
+  console.log("[pgagi] Fetching trending content")
 
     const results = await Promise.allSettled([fetchTrendingMovies(), fetchNews("technology")])
 
@@ -150,9 +150,9 @@ export const fetchTrendingContent = createAsyncThunk("content/fetchTrendingConte
 
     if (results[0].status === "fulfilled") {
       movieItems = results[0].value.results.slice(0, 8).map((movie) => transformMovieToContentItem(movie, true))
-      console.log("[v0] Successfully fetched", movieItems.length, "trending movies")
+  console.log("[pgagi] Successfully fetched", movieItems.length, "trending movies")
     } else {
-      console.error("[v0] Trending movies API failed:", results[0].reason)
+  console.error("[pgagi] Trending movies API failed:", results[0].reason)
     }
 
     if (results[1].status === "fulfilled") {
@@ -160,16 +160,16 @@ export const fetchTrendingContent = createAsyncThunk("content/fetchTrendingConte
         ...transformNewsToContentItem(article),
         trending: true,
       }))
-      console.log("[v0] Successfully fetched", newsItems.length, "trending news")
+  console.log("[pgagi] Successfully fetched", newsItems.length, "trending news")
     } else {
-      console.error("[v0] Trending news API failed:", results[1].reason)
+  console.error("[pgagi] Trending news API failed:", results[1].reason)
     }
 
     const allTrending = [...movieItems, ...newsItems]
-    console.log("[v0] Total trending items:", allTrending.length)
+  console.log("[pgagi] Total trending items:", allTrending.length)
     return allTrending
   } catch (error) {
-    console.error("[v0] Error fetching trending content:", error)
+  console.error("[pgagi] Error fetching trending content:", error)
     throw error
   }
 })
@@ -178,7 +178,7 @@ export const searchContent = createAsyncThunk("content/searchContent", async (qu
   if (!query.trim()) return []
 
   try {
-    console.log("[v0] Searching content for query:", query)
+  console.log("[pgagi] Searching content for query:", query)
 
     const results = await Promise.allSettled([searchNews(query), searchMovies(query), searchSocialPosts(query)])
 
@@ -188,30 +188,30 @@ export const searchContent = createAsyncThunk("content/searchContent", async (qu
 
     if (results[0].status === "fulfilled") {
       newsItems = results[0].value.articles.slice(0, 6).map(transformNewsToContentItem)
-      console.log("[v0] Found", newsItems.length, "news results")
+  console.log("[pgagi] Found", newsItems.length, "news results")
     } else {
-      console.error("[v0] News search failed:", results[0].reason)
+  console.error("[pgagi] News search failed:", results[0].reason)
     }
 
     if (results[1].status === "fulfilled") {
       movieItems = results[1].value.results.slice(0, 6).map((movie) => transformMovieToContentItem(movie))
-      console.log("[v0] Found", movieItems.length, "movie results")
+  console.log("[pgagi] Found", movieItems.length, "movie results")
     } else {
-      console.error("[v0] Movie search failed:", results[1].reason)
+  console.error("[pgagi] Movie search failed:", results[1].reason)
     }
 
     if (results[2].status === "fulfilled") {
       socialItems = results[2].value.slice(0, 4).map(transformSocialToContentItem)
-      console.log("[v0] Found", socialItems.length, "social results")
+  console.log("[pgagi] Found", socialItems.length, "social results")
     } else {
-      console.error("[v0] Social search failed:", results[2].reason)
+  console.error("[pgagi] Social search failed:", results[2].reason)
     }
 
     const allResults = [...newsItems, ...movieItems, ...socialItems]
-    console.log("[v0] Total search results:", allResults.length)
+  console.log("[pgagi] Total search results:", allResults.length)
     return allResults
   } catch (error) {
-    console.error("[v0] Error searching content:", error)
+  console.error("[pgagi] Error searching content:", error)
     throw error
   }
 })

@@ -39,11 +39,11 @@ const mockNewsData = {
 
 export async function GET(request: NextRequest) {
   try {
-    console.log("[v0] News API route called")
-    console.log("[v0] NEWS_API_KEY exists:", !!NEWS_API_KEY)
+  console.log("[pgagi] News API route called")
+  console.log("[pgagi] NEWS_API_KEY exists:", !!NEWS_API_KEY)
 
     if (!NEWS_API_KEY) {
-      console.log("[v0] No NEWS_API_KEY found, using mock data")
+  console.log("[pgagi] No NEWS_API_KEY found, using mock data")
       return NextResponse.json(mockNewsData)
     }
 
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
       url = `${NEWS_BASE_URL}/everything?q=${encodeURIComponent(query)}&apiKey=${NEWS_API_KEY}&pageSize=20&sortBy=publishedAt&page=${page}`
     }
 
-    console.log("[v0] Fetching from News API:", url.replace(NEWS_API_KEY, "***"))
+  console.log("[pgagi] Fetching from News API:", url.replace(NEWS_API_KEY, "***"))
 
     const response = await fetch(url, {
       headers: {
@@ -70,22 +70,22 @@ export async function GET(request: NextRequest) {
       },
     })
 
-    console.log("[v0] News API response status:", response.status)
+  console.log("[pgagi] News API response status:", response.status)
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.log("[v0] News API error response:", errorText)
+  console.log("[pgagi] News API error response:", errorText)
 
       // Return mock data on API failure
-      console.log("[v0] Returning mock data due to API error")
+  console.log("[pgagi] Returning mock data due to API error")
       return NextResponse.json(mockNewsData)
     }
 
     const data = await response.json()
-    console.log("[v0] News API success, articles count:", data.articles?.length || 0)
+  console.log("[pgagi] News API success, articles count:", data.articles?.length || 0)
     return NextResponse.json(data)
   } catch (error) {
-    console.error("[v0] Error in news API route:", error)
+  console.error("[pgagi] Error in news API route:", error)
     // Return mock data on any error
     return NextResponse.json(mockNewsData)
   }
