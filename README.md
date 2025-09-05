@@ -70,8 +70,8 @@ A modern, interactive content dashboard built with Next.js, React, TypeScript, a
    
    Add your API keys to `.env.local`:
    ```env
-   NEWS_API_KEY=your_news_api_key_here
-   TMDB_API_KEY=your_tmdb_api_key_here
+   NEXT_PUBLIC_NEWS_API_KEY=your_news_api_key_here
+   NEXT_PUBLIC_TMDB_API_KEY=your_tmdb_api_key_here
    NEXTAUTH_SECRET=your_secret_here
    NEXTAUTH_URL=http://localhost:3000
    ```

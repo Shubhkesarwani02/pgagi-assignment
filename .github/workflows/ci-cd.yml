@@ -39,8 +39,8 @@ jobs:
     - name: Run build
       run: npm run build
       env:
-        NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
-        TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        NEXT_PUBLIC_NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
+        NEXT_PUBLIC_TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
         NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
 
   e2e-tests:
@@ -63,15 +63,15 @@ jobs:
     - name: Build application
       run: npm run build
       env:
-        NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
-        TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        NEXT_PUBLIC_NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
+        NEXT_PUBLIC_TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
         NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
     
     - name: Start application
       run: npm start &
       env:
-        NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
-        TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        NEXT_PUBLIC_NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
+        NEXT_PUBLIC_TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
         NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
     
     - name: Wait for application to start
