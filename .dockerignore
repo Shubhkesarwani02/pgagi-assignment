@@ -1,0 +1,15 @@
+# Docker ignore file
+.next
+node_modules
+npm-debug.log
+.env*.local
+.git
+.gitignore
+README.md
+Dockerfile
+.dockerignore
+.next/
+.vercel/
+__tests__/
+cypress/
+coverage/

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useAppSelector, useAppDispatch } from "@/lib/hooks"
 import { fetchContent, fetchTrendingContent } from "@/lib/slices/content-slice"
 import { DragAndDropContentGrid } from "./drag-drop-content-grid"
+import { SearchComponent } from "./search-component"
 import { TrendingSection } from "./trending-section"
 import { FavoritesSection } from "./favorites-section"
 import { SettingsSection } from "./settings-section"
@@ -94,6 +95,15 @@ export function MainContent() {
       default: // feed
         return (
           <div className="p-6 space-y-8 max-w-7xl mx-auto">
+            {/* Search Component */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-4"
+            >
+              <SearchComponent />
+            </motion.div>
+
             {/* Header Section */}
             {!searchQuery && (
               <motion.div

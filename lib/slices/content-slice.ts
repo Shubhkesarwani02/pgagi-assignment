@@ -255,6 +255,18 @@ export const contentSlice = createSlice({
       const [removed] = state.items.splice(fromIndex, 1)
       state.items.splice(toIndex, 0, removed)
     },
+    reorderFavorites: (state, action: PayloadAction<{ fromIndex: number; toIndex: number }>) => {
+      const { fromIndex, toIndex } = action.payload
+      const [removed] = state.favorites.splice(fromIndex, 1)
+      state.favorites.splice(toIndex, 0, removed)
+    },
+    loadMoreContent: (state) => {
+      state.page += 1
+    },
+    resetPagination: (state) => {
+      state.page = 1
+      state.hasMore = true
+    },
     clearError: (state) => {
       state.error = null
     },
@@ -302,5 +314,14 @@ export const contentSlice = createSlice({
   },
 })
 
-export const { toggleFavorite, setSearchQuery, clearSearchResults, setSelectedCategory, reorderContent, clearError } =
-  contentSlice.actions
+export const { 
+  toggleFavorite, 
+  setSearchQuery, 
+  clearSearchResults, 
+  setSelectedCategory, 
+  reorderContent, 
+  reorderFavorites,
+  loadMoreContent,
+  resetPagination,
+  clearError 
+} = contentSlice.actions

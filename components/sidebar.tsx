@@ -9,10 +9,10 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { setActiveSection } from "@/lib/slices/user-slice"
 
 const navigation = [
-  { name: "Feed", icon: Home, id: "feed" as const },
-  { name: "Trending", icon: TrendingUp, id: "trending" as const },
-  { name: "Favorites", icon: Heart, id: "favorites" as const },
-  { name: "Settings", icon: Settings, id: "settings" as const },
+  { name: "Feed", icon: Home, id: "feed" as const, testId: "nav-feed" },
+  { name: "Trending", icon: TrendingUp, id: "trending" as const, testId: "nav-trending" },
+  { name: "Favorites", icon: Heart, id: "favorites" as const, testId: "nav-favorites" },
+  { name: "Settings", icon: Settings, id: "settings" as const, testId: "nav-settings" },
 ]
 
 export function Sidebar() {
@@ -68,6 +68,7 @@ export function Sidebar() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleNavClick(item.id)}
+                  data-testid={item.testId}
                   className={cn(
                     "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors",
                     isActive

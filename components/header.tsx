@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useCallback, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Search, Moon, Sun, ChevronDown, Filter, Bell, Settings } from "lucide-react"
+import { Search, Moon, Sun, ChevronDown, Filter, Bell, Settings, SlidersHorizontal } from "lucide-react"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { toggleDarkMode } from "@/lib/slices/user-slice"
 import { setSearchQuery, searchContent, clearSearchResults, setSelectedCategory } from "@/lib/slices/content-slice"
@@ -20,6 +20,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Checkbox } from "@/components/ui/checkbox"
 import { debounce } from "lodash"
 
 export function Header() {
@@ -28,6 +30,8 @@ export function Header() {
   const { searchQuery, searchResults, categories, selectedCategory, loading } = useAppSelector((state) => state.content)
   const [showSearchResults, setShowSearchResults] = useState(false)
   const [searchInput, setSearchInput] = useState("")
+  const [searchFilters, setSearchFilters] = useState<string[]>(["news", "movie", "social"])
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
 
   const debouncedSearch = useCallback(
     debounce((query: string) => {
@@ -38,7 +42,7 @@ export function Header() {
         dispatch(clearSearchResults())
         setShowSearchResults(false)
       }
-    }, 500),
+    }, 300),
     [dispatch],
   )
 
@@ -51,9 +55,33 @@ export function Header() {
 
   const handleClearSearch = () => {
     setSearchInput("")
+    dispatch(setSearchQuery(""))
     dispatch(clearSearchResults())
     setShowSearchResults(false)
   }
+
+  // Sync search input with Redux state when component mounts or searchQuery changes externally
+  useEffect(() => {
+    setSearchInput(searchQuery)
+  }, [searchQuery])
+
+  const handleFilterToggle = (filter: string) => {
+    setSearchFilters(prev => 
+      prev.includes(filter) 
+        ? prev.filter(f => f !== filter)
+        : [...prev, filter]
+    )
+  }
+
+  const filteredSearchResults = searchResults.filter(item => 
+    searchFilters.includes(item.type)
+  )
+
+  const searchTypes = [
+    { value: "news", label: "News", count: searchResults.filter(item => item.type === "news").length },
+    { value: "movie", label: "Movies", count: searchResults.filter(item => item.type === "movie").length },
+    { value: "social", label: "Social", count: searchResults.filter(item => item.type === "social").length },
+  ]
 
   useEffect(() => {
     const handleClickOutside = () => setShowSearchResults(false)
@@ -93,37 +121,82 @@ export function Header() {
         </Select>
       </div>
 
-      {/* Center - Enhanced Search Bar */}
+      {/* Center - Enhanced Search Bar with Filters */}
       <div className="flex-1 max-w-2xl mx-auto relative" onClick={(e) => e.stopPropagation()}>
-        <motion.div
-          className="relative"
-          whileFocus={{ scale: 1.02 }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        >
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search across news, movies, and social posts..."
-            className="pl-10 pr-12 w-full bg-background/50 border-border/50 focus:bg-background focus:border-primary/50 transition-all duration-200"
-            value={searchInput}
-            onChange={handleSearchChange}
-            onFocus={() => searchInput && setShowSearchResults(true)}
-          />
-          {searchInput && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
-              onClick={handleClearSearch}
-            >
-              ×
-            </Button>
-          )}
-          {loading && (
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
-            </div>
-          )}
-        </motion.div>
+        <div className="flex items-center gap-2">
+          <motion.div
+            className="relative flex-1"
+            whileFocus={{ scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          >
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search across news, movies, and social posts..."
+              className="pl-10 pr-12 w-full bg-background/50 border-border/50 focus:bg-background focus:border-primary/50 transition-all duration-200"
+              value={searchInput}
+              onChange={handleSearchChange}
+              onFocus={() => searchInput && setShowSearchResults(true)}
+            />
+            {searchInput && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                onClick={handleClearSearch}
+              >
+                ×
+              </Button>
+            )}
+            {loading && (
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
+              </div>
+            )}
+          </motion.div>
+
+          {/* Search Filters */}
+          <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+            <PopoverTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="icon"
+                className="relative"
+              >
+                <SlidersHorizontal className="h-4 w-4" />
+                {searchFilters.length < 3 && (
+                  <span className="absolute -top-1 -right-1 h-2 w-2 bg-primary rounded-full" />
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-56" align="end">
+              <div className="space-y-4">
+                <h4 className="font-medium text-sm">Filter by content type</h4>
+                <div className="space-y-2">
+                  {searchTypes.map((type) => (
+                    <div key={type.value} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={type.value}
+                        checked={searchFilters.includes(type.value)}
+                        onCheckedChange={() => handleFilterToggle(type.value)}
+                      />
+                      <label 
+                        htmlFor={type.value} 
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2"
+                      >
+                        {type.label}
+                        {type.count > 0 && (
+                          <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
+                            {type.count}
+                          </Badge>
+                        )}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
 
         <AnimatePresence>
           {showSearchResults && searchResults.length > 0 && (
@@ -137,49 +210,72 @@ export function Header() {
               <div className="p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-semibold text-foreground">Search Results</h3>
-                  <Badge variant="secondary" className="text-xs">
-                    {searchResults.length} found
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="text-xs">
+                      {filteredSearchResults.length} of {searchResults.length}
+                    </Badge>
+                    {searchFilters.length < 3 && (
+                      <Badge variant="outline" className="text-xs">
+                        Filtered
+                      </Badge>
+                    )}
+                  </div>
                 </div>
-                <div className="space-y-2 max-h-80 overflow-y-auto">
-                  {searchResults.map((item, index) => (
-                    <motion.div
-                      key={item.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      whileHover={{ backgroundColor: "var(--accent)", scale: 1.02 }}
-                      className="p-3 rounded-lg cursor-pointer transition-all duration-200"
-                      onClick={() => {
-                        setShowSearchResults(false)
-                        // Handle item click - could navigate or open modal
-                      }}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="relative">
-                          <img
-                            src={item.image || "/placeholder.svg?key=search"}
-                            alt={item.title}
-                            className="w-12 h-12 rounded-lg object-cover"
-                          />
-                          <Badge variant="secondary" className="absolute -top-1 -right-1 text-xs px-1 py-0">
-                            {item.type}
-                          </Badge>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{item.title}</p>
-                          <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{item.description}</p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Badge variant="outline" className="text-xs">
-                              {item.category}
+                {filteredSearchResults.length > 0 ? (
+                  <div className="space-y-2 max-h-80 overflow-y-auto">
+                    {filteredSearchResults.map((item, index) => (
+                      <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        whileHover={{ backgroundColor: "var(--accent)", scale: 1.02 }}
+                        className="p-3 rounded-lg cursor-pointer transition-all duration-200"
+                        onClick={() => {
+                          setShowSearchResults(false)
+                          // Handle item click - could navigate or open modal
+                        }}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="relative">
+                            <img
+                              src={item.image || "/placeholder.svg?key=search"}
+                              alt={item.title}
+                              className="w-12 h-12 rounded-lg object-cover"
+                            />
+                            <Badge variant="secondary" className="absolute -top-1 -right-1 text-xs px-1 py-0">
+                              {item.type}
                             </Badge>
-                            {item.source && <span className="text-xs text-muted-foreground">{item.source}</span>}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">{item.title}</p>
+                            <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{item.description}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge variant="outline" className="text-xs">
+                                {item.category}
+                              </Badge>
+                              {item.source && <span className="text-xs text-muted-foreground">{item.source}</span>}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <p className="text-sm text-muted-foreground">
+                      No results match your current filters
+                    </p>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="mt-2"
+                      onClick={() => setSearchFilters(["news", "movie", "social"])}
+                    >
+                      Clear filters
+                    </Button>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}
